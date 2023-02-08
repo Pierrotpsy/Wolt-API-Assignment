@@ -1,0 +1,203 @@
+### Test 1 : Base Test
+POST http://localhost:8080/
+Content-Type: application/json
+
+{
+  "cart_value": 790,
+  "delivery_distance": 2235,
+  "number_of_items": 4,
+  "time": "2021-10-12T13:00:00Z"
+}
+
+> {%
+    client.test("Fee calculated successfully", function() {
+        client.assert(response.body == "{\"delivery_fee\": 710}", "Fee is wrong");
+    });
+%}
+
+### Test 2 : Rush Day
+POST http://localhost:8080/
+Content-Type: application/json
+
+{
+  "cart_value": 790,
+  "delivery_distance": 2235,
+  "number_of_items": 4,
+  "time": "2021-10-15T10:00:00Z"
+}
+
+> {%
+    client.test("Fee calculated successfully", function() {
+        client.assert(response.body == "{\"delivery_fee\": 710}", "Fee is wrong");
+    });
+%}
+
+### Test 3 : Rush Day & Hour
+POST http://localhost:8080/
+Content-Type: application/json
+
+{
+  "cart_value": 790,
+  "delivery_distance": 2235,
+  "number_of_items": 4,
+  "time": "2021-10-15T13:00:00Z"
+}
+
+> {%
+    client.test("Fee calculated successfully", function() {
+        client.assert(response.body == "{\"delivery_fee\": 852}", "Fee is wrong");
+    });
+%}
+
+### Test 4 : Over 4 items
+POST http://localhost:8080/
+Content-Type: application/json
+
+{
+  "cart_value": 790,
+  "delivery_distance": 2235,
+  "number_of_items": 12,
+  "time": "2021-10-16T13:00:00Z"
+}
+
+> {%
+    client.test("Fee calculated successfully", function() {
+        client.assert(response.body == "{\"delivery_fee\": 1110}", "Fee is wrong");
+    });
+%}
+
+### Test 5 : Over 12 items
+POST http://localhost:8080/
+Content-Type: application/json
+
+{
+  "cart_value": 790,
+  "delivery_distance": 2235,
+  "number_of_items": 13,
+  "time": "2021-10-16T13:00:00Z"
+}
+
+> {%
+    client.test("Fee calculated successfully", function() {
+        client.assert(response.body == "{\"delivery_fee\": 1280}", "Fee is wrong");
+    });
+%}
+
+### Test 6 : Free delivery
+POST http://localhost:8080/
+Content-Type: application/json
+
+{
+  "cart_value": 10000,
+  "delivery_distance": 2235,
+  "number_of_items": 7,
+  "time": "2021-10-15T13:00:00Z"
+}
+
+> {%
+    client.test("Fee calculated successfully", function() {
+        client.assert(response.body == "{\"delivery_fee\": 0}", "Fee is wrong");
+    });
+%}
+
+### Test 7 : Distance below
+POST http://localhost:8080/
+Content-Type: application/json
+
+{
+  "cart_value": 790,
+  "delivery_distance": 1499,
+  "number_of_items": 4,
+  "time": "2021-10-12T13:00:00Z"
+}
+
+> {%
+    client.test("Fee calculated successfully", function() {
+        client.assert(response.body == "{\"delivery_fee\": 510}", "Fee is wrong");
+    });
+%}
+
+### Test 8 : Distance equal
+POST http://localhost:8080/
+Content-Type: application/json
+
+{
+  "cart_value": 790,
+  "delivery_distance": 1500,
+  "number_of_items": 4,
+  "time": "2021-10-12T13:00:00Z"
+}
+
+> {%
+    client.test("Fee calculated successfully", function() {
+        client.assert(response.body == "{\"delivery_fee\": 510}", "Fee is wrong");
+    });
+%}
+
+### Test 9 : Distance over
+POST http://localhost:8080/
+Content-Type: application/json
+
+{
+  "cart_value": 790,
+  "delivery_distance": 1501,
+  "number_of_items": 4,
+  "time": "2021-10-12T13:00:00Z"
+}
+
+> {%
+    client.test("Fee calculated successfully", function() {
+        client.assert(response.body == "{\"delivery_fee\": 610}", "Fee is wrong");
+    });
+%}
+
+### Test 10 : Fee over 15 euros
+POST http://localhost:8080/
+Content-Type: application/json
+
+{
+  "cart_value": 790,
+  "delivery_distance": 150100,
+  "number_of_items": 4,
+  "time": "2021-10-12T13:00:00Z"
+}
+
+> {%
+    client.test("Fee calculated successfully", function() {
+        client.assert(response.body == "{\"delivery_fee\": 1500}", "Fee is wrong");
+    });
+%}
+
+### Test 11 : Fee over 15 euros & rush
+POST http://localhost:8080/
+Content-Type: application/json
+
+{
+  "cart_value": 790,
+  "delivery_distance": 150100,
+  "number_of_items": 4,
+  "time": "2021-10-15T13:00:00Z"
+}
+
+> {%
+    client.test("Fee calculated successfully", function() {
+        client.assert(response.body == "{\"delivery_fee\": 1500}", "Fee is wrong");
+    });
+%}
+
+### Test 12 : Cart under 10 euros
+POST http://localhost:8080/
+Content-Type: application/json
+
+{
+  "cart_value": 10,
+  "delivery_distance": 1000,
+  "number_of_items": 4,
+  "time": "2021-10-12T13:00:00Z"
+}
+
+> {%
+    client.test("Fee calculated successfully", function() {
+        client.assert(response.body == "{\"delivery_fee\": 1190}", "Fee is wrong");
+    });
+%}
